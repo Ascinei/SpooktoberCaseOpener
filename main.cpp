@@ -7,6 +7,11 @@ using namespace std;
 
 string rarity{};
 map<string, int> inventory;
+int legendaryChance{5};
+int epicChance{20};
+int rareChance{100};
+int uncommonChance{350};
+int currency{0};
 
 map<string, int> itemMap(int roll) {
     map<string, int> commonItems;
@@ -23,7 +28,7 @@ map<string, int> itemMap(int roll) {
     uncommonItems["Bat"] = 30;
     uncommonItems["Pumpkin"] = 30;
     uncommonItems["Spider"] = 30;
-    uncommonItems["Pumpkin"] = 30;
+    uncommonItems["Candle"] = 30;
     
     rareItems["Cat"] = 200;
     rareItems["Jack O'Lantern"] = 200;
@@ -78,75 +83,145 @@ string itemPull() {
 map<string, int> initInventory()
 {
     map<string, int> result;
-    result["#1 (Common) Candycorn"] = 0;
-    result["#2 (Common) Cobweb"] = 0;
-    result["#3 (Common) Stick"] = 0;
-    result["#4 (Common) Rock"] = 0;
+    result["1 Common Candycorn"] = 0;
+    result["1 Common Cobweb"] = 0;
+    result["1 Common Stick"] = 0;
+    result["1 Common Rock"] = 0;
     
-    result["#5 (Uncommon) Bat"] = 0;
-    result["#6 (Uncommon) Pumpkin"] = 0;
-    result["#7 (Uncommon) Spider"] = 0;
-    result["#8 (Uncommon) Pumpkin"] = 0;
+    result["2 Uncommon Bat"] = 0;
+    result["2 Uncommon Pumpkin"] = 0;
+    result["2 Uncommon Spider"] = 0;
+    result["2 Uncommon Candle"] = 0;
     
-    result["#9 (Rare) Cat"] = 0;
-    result["#10 (Rare) Jack O'Lantern"] = 0;
-    result["#11 (Rare) Coffin"] = 0;
-    result["#12 (Rare) Tombstone"] = 0;
+    result["3 Rare Cat"] = 0;
+    result["3 Rare Jack O'Lantern"] = 0;
+    result["3 Rare Coffin"] = 0;
+    result["3 Rare Tombstone"] = 0;
 
-    result["#13 (Epic) Skeleton"] = 0;
-    result["#14 (Epic) Vampire"] = 0;
-    result["#15 (Epic) Witch"] = 0;
-    result["#16 (Epic) Ghost"] = 0;
+    result["4 Epic Skeleton"] = 0;
+    result["4 Epic Vampire"] = 0;
+    result["4 Epic Witch"] = 0;
+    result["4 Epic Ghost"] = 0;
 
-    result["#17 (Legendary) Headless Horseman"] = 0;
-    result["#18 (Legendary) Flying Dutchman"] = 0;
-    result["#19 (Legendary) Headless Horseman"] = 0;
-    result["#20 (Legendary) Spooky Scary Skeleton"] = 0;
+    result["5 Legendary eadless Horseman"] = 0;
+    result["5 Legendary Flying Dutchman"] = 0;
+    result["5 Legendary Headless Horseman"] = 0;
+    result["5 Legendary Spooky Scary Skeleton"] = 0;
     
     return result;
 }
 
+string rarityToStringInt(string rarity) {
+    if(rarity == "Common") return "1";
+    else if(rarity == "Uncommon") return "2";
+    else if(rarity == "Rare") return "3";
+    else if(rarity == "Epic") return "4";
+    else if(rarity == "Legendary") return "5";
+    return "-1";
+}
 
-void addToInventory(string item) {
-    inventory.find(item)->second+=1;
+void addToInventory(string item, string rarity) {
+    inventory.find(rarityToStringInt(rarity) + " " + rarity + " " + item)->second+=1;
 }
 
 string checkInventory() {
     system("cls");
-    for(auto it = inventory.begin(); it != inventory.end(); it++) {
-        cout << it->first << ": " << it->second << "\n";
+    for(auto it = inventory.begin(); it != inventory.end(); ++it) {
+        cout << it->first.substr(2) << ": " << it->second << "\n";
     }
     return "";
 }
 
+void promptRarity();
 
-void sellMenu() {
-    string input{};
+void sellMenu(int selector, int invIndex) {
+    int input{};
     system("cls");
-    cout << "Pretend I printed the whole map\n";
-    cout << "What would you like to sell?\n";
+    map<string, int> rarityMap = itemMap(selector);
+    int i{1};
+    for(auto it = rarityMap.begin(); it != rarityMap.end(); ++it) {
+        cout << "(" << i << ") " << it->first << ": " << it->second << " Spoopy coins" << "\n";
+        i++;
+    }
+    cout << "(" << i << ") " << "Back to rarity menu.\n";
+    cout << "What would you like to sell: \n";
     cin >> input;
+    if (input > 0 && input < i) {
+        auto invIt = inventory.begin();
+        advance(invIt, (invIndex-1)*4 + input - 1);
+        if (invIt->second==0) {
+            system("cls");
+            cout << "You have no " << invIt->first << " to sell!\n";
+            cin.ignore();
+            cin.get();
+        }
+        else {
+            cout << "You have " << invIt->second << " " << invIt->first << ".\n";
+            inventory.find(invIt->first)->second-=1;
+            auto it = rarityMap.begin();
+            advance(it, input - 1);
+            system("cls");
+            currency += it->second;
+            cout << "Sold " << it->first << " for " << it->second << " Spoppy coins.\nYou now have " << currency << " Spoopy coins.\n";
+            cout << "You now have " << invIt->second << " " << invIt->first << ".\n";
+            cin.ignore();
+            cin.get();    
+        }
+        sellMenu(selector, invIndex);
+    }    
+    if (input == i) {
+        promptRarity();
+    } else {
+        sellMenu(selector, invIndex);
+    }
+    
     system("cls");
 }
 
+
 void promptBuyOrSell() {
     system("cls");
-    string input{};
+    int input{};
     cout << "(1) Buy items\n(2) Sell items\n(3) Back to menu\nPlease enter an option: ";
     cin >> input;
-    if(input == "2") {
-        sellMenu();
+    if(input == 2) {
+        promptRarity();
     }
-    if(input == "3") {
+    if(input == 3) {
         system("cls");
     }
 }
 
+void promptRarity() {
+    system("cls");
+    int input{};
+    cout << "(1) Common\n(2) Uncommon\n(3) Rare\n(4) Epic\n(5) Legendary\n(6) Back to buy or sell.\nPlease enter an option: ";
+    cin >> input;
+    if(input == 1) {
+        sellMenu(uncommonChance+1, 0);
+    }    
+    if(input == 2) {
+        sellMenu(uncommonChance, 1);
+    }
+    if(input == 3) {
+        sellMenu(rareChance, 2);
+    }
+    if(input == 4) {
+        sellMenu(epicChance, 3);
+    }    
+    if(input == 5) {
+        sellMenu(legendaryChance, 4);
+    }
+    if(input == 6) {
+        promptBuyOrSell();
+    }
+}
 
 int main() {
     srand(time(NULL));
+    
     inventory = initInventory();
-    string input{};
+    int input{};
     string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
     string dump{};
     string item{};
@@ -155,27 +230,27 @@ int main() {
         cout << menu;
         cin >> input;
 
-        if(input == "1") {
+        if(input == 1) {
             system("cls");
             item = itemPull();
-            addToInventory(item);
-            cout << "\n\nYou got a " << rarity << " " << item << "!\n\n";
+            addToInventory(item, rarity);
+            cout << "\n\nYou got a " << rarity << " " << item  << "!\n\n";
             cin.ignore();
             cin.get();
             system("color 02");
             system("cls");
         }
-        if(input == "2") {
+        if(input == 2) {
             checkInventory();
             cin.ignore();
             cin.get();
             system("color 02");
             system("cls");
         }
-        if(input == "3") {
+        if(input == 3) {
             promptBuyOrSell();
         }
-        if(input == "0") {
+        if(input == 0) {
             system("cls");
             exit(0);
         }
