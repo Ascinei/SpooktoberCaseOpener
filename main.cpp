@@ -2,13 +2,12 @@
 #include <string>
 #include <map>
 #include <time.h>
-#include <stdlib.h>
-#include <limits>
-#include <conio.h>
 
 using namespace std;
 
-map<string, int> itemPull(int roll) {
+string rarity{};
+
+map<string, int> itemMap(int roll) {
     map<string, int> commonItems;
     map<string, int> uncommonItems;
     map<string, int> rareItems;
@@ -44,25 +43,37 @@ map<string, int> itemPull(int roll) {
     if (roll <= 5)
     {
         system("color 86");
+        rarity = "Legendary";
         return legendaryItems;
     } else if (roll <= 20)
     {
+        rarity = "Epic";
         return epicItems;
     } else if (roll <= 100)
     {
+        rarity = "Rare";
         return rareItems;
     } else if (roll <= 350)
     {
+        rarity = "Uncommon";
         return uncommonItems;
     }
-
+    rarity = "Common";
     return commonItems;
+}
+
+string itemPull() {
+    int roll = rand() % 1000;
+    int val = rand() % itemMap(roll).size();
+    auto itemS = itemMap(roll).begin();
+    advance(itemS, val);
+    return itemS->first;
 }
 
 int main() {
     srand(time(NULL));
     string input{};
-    string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(5) Close game.\nPlease enter an option: "};
+    string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
     string dump{};
     string item{};
     while (true) {
@@ -70,17 +81,20 @@ int main() {
         cout << menu;
 
         cin >> input;
-        int roll = rand() % 1000;
+
         if(input == "1") {
             system("clear");
-            item = itemPull(roll).begin()->first;
-            cout << "\n\nYou got a " << item << "!\n\n";
-            cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+            item = itemPull();
+            cout << "\n\nYou got a " << rarity << " " << item << "!\n\n";
+            cin.ignore();
             cin.get();
             system("color 02");
             system("clear");
         }
-            
+        if(input == "0") {
+            system("clear");
+            exit(0);
+        }
     }
     return 0;
 }
