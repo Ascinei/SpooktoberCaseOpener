@@ -6,6 +6,7 @@
 using namespace std;
 
 string rarity{};
+map<string, int> inventory;
 
 map<string, int> itemMap(int roll) {
     map<string, int> commonItems;
@@ -63,15 +64,64 @@ map<string, int> itemMap(int roll) {
 }
 
 string itemPull() {
+    string item{};
+
     int roll = rand() % 1000;
-    int val = rand() % itemMap(roll).size();
-    auto itemS = itemMap(roll).begin();
+    map<string, int> iMap = itemMap(roll);
+    int val = rand() % iMap.size();
+    auto itemS = iMap.begin();
     advance(itemS, val);
-    return itemS->first;
+    item = itemS->first;;
+    return item;
+}
+
+map<string, int> initInventory()
+{
+    map<string, int> result;
+    result["Candycorn"] = 0;
+    result["Cobweb"] = 0;
+    result["Stick"] = 0;
+    result["Rock"] = 0;
+    
+    result["Bat"] = 0;
+    result["Pumpkin"] = 0;
+    result["Spider"] = 0;
+    result["Pumpkin"] = 0;
+    
+    result["Cat"] = 0;
+    result["Jack O'Lantern"] = 0;
+    result["Coffin"] = 0;
+    result["Tombstone"] = 0;
+
+    result["Skeleton"] = 0;
+    result["Vampire"] = 0;
+    result["Witch"] = 0;
+    result["Ghost"] = 0;
+
+    result["Headless Horseman"] = 0;
+    result["Flying Dutchman"] = 0;
+    result["Headless Horseman"] = 0;
+    result["Spooky Scary Skeleton"] = 0;
+    
+    return result;
+}
+
+
+void addToInventory(string item) {
+    inventory.find(item)->second+=1;
+}
+
+string checkInventory() {
+    system("cls");
+    for(auto it = inventory.cbegin(); it != inventory.cend(); ++it) {
+        cout << it->first << ": " << it->second << "\n";
+    }
+    return "";
 }
 
 int main() {
     srand(time(NULL));
+    inventory = initInventory();
     string input{};
     string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
     string dump{};
@@ -79,20 +129,27 @@ int main() {
     while (true) {
         system("color 02");
         cout << menu;
-
         cin >> input;
 
         if(input == "1") {
-            system("clear");
+            system("cls");
             item = itemPull();
+            addToInventory(item);
             cout << "\n\nYou got a " << rarity << " " << item << "!\n\n";
             cin.ignore();
             cin.get();
             system("color 02");
-            system("clear");
+            system("cls");
+        }
+        if(input == "2") {
+            checkInventory();
+            cin.ignore();
+            cin.get();
+            system("color 02");
+            system("cls");
         }
         if(input == "0") {
-            system("clear");
+            system("cls");
             exit(0);
         }
     }
