@@ -12,7 +12,7 @@ int legendaryChance{ 5 };
 int epicChance{ 20 };
 int rareChance{ 100 };
 int uncommonChance{ 350 };
-int currency{ 0 };
+int currency{ 1000000 };
 bool oneTime{ false };
 
 // Global variables for upgrades.   Increments/Caps     Total Purchases
@@ -23,6 +23,11 @@ int legendaryChanceIncrease = 0; // 3          555      185
 
 float sellPriceModifier = 1.00;   // Self * 1.05        inf.
 
+int cost1{ 300 };
+int cost2{ 1000 };
+int cost3{ 2500 };
+int cost4{ 5000 };
+int cost5{ 1000 };
 // int doubleDropChance;
 
 map<string, int> itemMap(int roll) {
@@ -142,6 +147,7 @@ string checkInventory() {
     for(auto it = inventory.begin(); it != inventory.end(); ++it) {
         cout << it->first.substr(2) << ": " << it->second << "\n";
     }
+    cout << "Press enter to continue";
     return "";
 }
 
@@ -175,7 +181,7 @@ void sellMenu(int selector, int invIndex) {
             advance(it, input - 1);
             system("cls");
             currency += it->second;
-            cout << "Sold " << it->first << " for " << it->second << " Spoppy coins.\nYou now have " << currency << " Spoopy coins.\n";
+            cout << "Sold " << it->first << " for " << it->second << " Spoopy coins.\nYou now have " << currency << " Spoopy coins.\n";
             cout << "You now have " << invIt->second << " " << invIt->first.substr(2) << ".\n";
             cin.ignore();
             cin.get();    
@@ -239,59 +245,97 @@ void promptRarity() {
 void buyMenu() {
     system("cls");
     int input{};
-    cout << "(1) Uncommon chance upgrade\n(2) Rare chance upgrade\n(3) Epic chance upgrade\n(4) Legendary chance upgrade\n(5) Sell price multiplier\n(6) Back to buy or sell\nPlease enter an option: ";
+
+    cout << "(1) Uncommon chance upgrade level " << uncommonChanceIncrease/14+1 << " for " << cost1 << " Spoopy coins.\n(2) Rare chance upgrade level " << rareChanceIncrease/10 + 1 << " for " << cost2 << " Spoopy coins.\n(3) Epic chance upgrade level "<< epicChanceIncrease/5 + 1 << " for " << cost3 << " Spoppy coins.\n(4) Legendary chance upgrade level "<< legendaryChanceIncrease/3 + 1 << " for " << cost4 << " Spoopy coins.\n(5) Sell price multiplier for " << cost5 << " Spoopy coins. (Currently " << sellPriceModifier << "x)\n(6) Back to buy or sell\nPlease enter an option: ";
     cin >> input;   
 
     if(input == 1) {
-        int cost{ 300 };
-        if (currency >= cost) {
+        
+        if (currency >= cost1) {
+            system("cls");
             uncommonChanceIncrease += 14;
-            currency -= cost;
+            currency -= cost1;
+            cost1 = (int) ((double) cost1 * 1.01);
+            cout << "Successfully bought the Uncommon chance increase, your chance of an Uncommon is now: " << (float) (uncommonChanceIncrease+250)/10 << "%";
+            cin.ignore();
+            cin.get();       
+            buyMenu();
+        }   else {
+            system("cls");
+            cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost1 - currency << " more.";
+            cin.ignore();
+            cin.get();
+            buyMenu();       
         }
     }
     if(input == 2) {
-        int cost{ 1000 };
         if  (uncommonChanceIncrease>=140) {
-            system("cls");
-            rareChanceIncrease += 10;
-            currency -= cost;
+            if(currency >= cost2) {
+                system("cls");
+                rareChanceIncrease += 10;
+                currency -= cost2;
+                cost2 += (int) ((double) cost2 * 1.015);
+                cout << "Successfully bought the Rare chance increase, your chance of a Rare is now: " << (float) (rareChanceIncrease+80)/10 << "%";
+                cin.ignore();
+                cin.get();           
+                buyMenu(); 
+            } else {
+                system("cls");
+                cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost2 - currency << " more.";
+                cin.ignore();
+                cin.get();
+                buyMenu();            
+            }
         } else {
-
+            system("cls");
+            cout << "Your Uncommon Chance Upgrade is at level " << uncommonChanceIncrease/14 << " and needs to be at level 10 to get this upgrade.";
+            cin.ignore();
+            cin.get();
+            buyMenu();        
         }
     }
     if(input == 3) {
-        int cost{ 3000 };
+
         if (rareChanceIncrease >= 300) {
-            if(currency >= cost) {
+            if(currency >= cost3) {
                 system("cls");
                 epicChanceIncrease += 5;
-                currency -= cost;
+                currency -= cost3;
+                cost3 = (int) ((double) cost3 * 1.02);
+                cout << "Successfully bought the Epic chance increase, your chance of a Epic is now: " << (float) (epicChanceIncrease+15)/10 << "%";
+                cin.ignore();
+                cin.get();
+                buyMenu();            
             } else {
                 system("cls");
-                cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost - currency << " more.";
+                cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost3 - currency << " more.";
                 cin.ignore();
                 cin.get();
                 buyMenu();
             }
         } else {
             system("cls");
+            cout << "Your Rare Chance Upgrade is at level " << rareChanceIncrease/10 << " and needs to be at level 30 to get this upgrade.";
+            cin.ignore();
+            cin.get();
+            buyMenu();
         }
     }
     if(input == 4) {
-        int cost{ 10000 };
+
         if (epicChanceIncrease >= 350) {
-            if (currency >= 10000) {
+            if (currency >= cost4) {
                 system("cls");
                 legendaryChanceIncrease += 3;
-                currency -= cost;
-                cost *= 1.008;
+                currency -= cost4;
+                cost4 = (int) ((double) cost4 * 1.025);
                 cout << "Successfully bought the Legendary chance increase, your chance of a Legendary is now: " << (float) (legendaryChanceIncrease+5)/10 << "%";
                 cin.ignore();
                 cin.get();
                 buyMenu();
             } else {
                 system("cls");
-                cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost - currency << " more.";
+                cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost4 - currency << " more.";
                 cin.ignore();
                 cin.get();
                 buyMenu();
@@ -306,19 +350,18 @@ void buyMenu() {
     }
 
     if(input == 5) {
-        int cost { 1000 };
-        if(currency >= cost) {
+        if(currency >= cost5) {
             system("cls");
-            sellPriceModifier *= 1.01;
-            currency -= cost;
-            cost *= 1.008;
+            sellPriceModifier *= 1.05;
+            currency -= cost5;
+            cost5 = (int) ((double) cost5 * 1.035);
             cout << "Successfully bought Sell Price Multiplier, current value is at: " << sellPriceModifier << "x sell value.";
             cin.ignore();
             cin.get();
             buyMenu();
         } else {
             system("cls");
-            cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost - currency << " more.";
+            cout << "You don't have enough Spoopy coins!! You have " << currency << " Spoopy coins currently and need " << cost5 - currency << " more.";
             cin.ignore();
             cin.get();
             buyMenu();
