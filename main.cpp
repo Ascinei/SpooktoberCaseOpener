@@ -15,13 +15,15 @@ int uncommonChance{350};
 int currency{0};
 bool oneTime{false};
 
-// Global variables for upgrades.   Increments/Caps
-int uncommonChanceIncrease = 0;  // 14         900
-int rareChanceIncrease = 0;      // 7          775
-int epicChanceIncrease = 0;      // 5          650
-int legendaryChanceIncrease = 0; // 3          500
+// Global variables for upgrades.   Increments/Caps     Total Purchases
+int uncommonChanceIncrease = 0;  // 14         900      50
+int rareChanceIncrease = 0;      // 10         775      70
+int epicChanceIncrease = 0;      // 5          650      130
+int legendaryChanceIncrease = 0; // 3          555      185
 
-float sellPriceModifier = 1.8;   // 0.1        inf.
+float sellPriceModifier = 1.00;   // Self * 1.05        inf.
+
+// int doubleDropChance;
 
 map<string, int> itemMap(int roll) {
     map<string, int> commonItems;
@@ -58,7 +60,6 @@ map<string, int> itemMap(int roll) {
 
     if (roll <= 5)
     {
-        system("color 86");
         rarity = "Legendary";
         return legendaryItems;
     } else if (roll <= 15)
@@ -78,9 +79,6 @@ map<string, int> itemMap(int roll) {
     return commonItems;
 }
 
-void updateUpgrades() {
-    
-}
 
 
 string itemPull() {
@@ -194,12 +192,16 @@ void sellMenu(int selector, int invIndex) {
 }
 
 int main();
+void buyMenu();
 
 void promptBuyOrSell() {
     system("cls");
     int input{};
     cout << "(1) Buy upgrades\n(2) Sell items\n(3) Back to menu\nPlease enter an option: ";
     cin >> input;
+    if(input == 1) {
+        buyMenu();
+    }
     if(input == 2) {
         promptRarity();
     }
@@ -232,6 +234,48 @@ void promptRarity() {
     if(input == 6) {
         promptBuyOrSell();
     }
+}
+
+void buyMenu() {
+    system("cls");
+    int input{};
+    cout << "(1) Uncommon chance upgrade\n(2) Rare chance upgrade\n(3) Epic chance upgrade\n(4) Legendary chance upgrade\n(5) Sell price multiplier\n(6) Back to buy or sell\nPlease enter an option: ";
+    cin >> input;   
+
+    if(input == 1) {
+        if (currency >= 300) {
+            uncommonChanceIncrease += 14;
+        }
+    }
+    if(input == 2) {
+        if  (uncommonChanceIncrease>=140) {
+            rareChanceIncrease += 10;
+        }
+    }
+    if(input == 3) {
+        if (rareChanceIncrease >= 300) {
+            epicChanceIncrease += 5;
+        }
+    }
+    if(input == 4) {
+        if (epicChanceIncrease >= 350) {
+            legendaryChanceIncrease += 3;
+        }
+    }
+    if(input == 5) {
+        sellPriceModifier *= 1.01;
+    }
+    if(input == 6) {
+        promptBuyOrSell();
+    }
+}
+
+void updateUpgrades(string upgrade) {
+    if(upgrade == "sellPrice") sellPriceModifier *= 1.01;
+    if(upgrade == "uncommonChance") uncommonChanceIncrease += 14;
+    if(upgrade == "rareChance") rareChanceIncrease += 10;
+    if(upgrade == "epicChance") epicChanceIncrease += 5;
+    if(upgrade == "legendaryChance") legendaryChanceIncrease += 3;
 }
 
 
