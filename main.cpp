@@ -6,14 +6,14 @@
 using namespace std;
 
 // Random global variables that idk how else to declare
-string rarity{};
+string rarity{ };
 map<string, int> inventory;
-int legendaryChance{5};
-int epicChance{20};
-int rareChance{100};
-int uncommonChance{350};
-int currency{0};
-bool oneTime{false};
+int legendaryChance{ 5 };
+int epicChance{ 20 };
+int rareChance{ 100 };
+int uncommonChance{ 350 };
+int currency{ 0 };
+bool oneTime{ false };
 
 // Global variables for upgrades.   Increments/Caps     Total Purchases
 int uncommonChanceIncrease = 0;  // 14         900      50
@@ -52,7 +52,7 @@ map<string, int> itemMap(int roll) {
     epicItems["Witch"] = (int) (2000 * sellPriceModifier);
     epicItems["Ghost"] = (int) (2000 * sellPriceModifier);
 
-    legendaryItems["Headless Horseman"] = (int) (12500 * sellPriceModifier);
+    legendaryItems["Casper the Friendly Ghost"] = (int) (12500 * sellPriceModifier);
     legendaryItems["Flying Dutchman"] = (int) (12500 * sellPriceModifier);
     legendaryItems["Headless Horseman"] = (int) (12500 * sellPriceModifier);
     legendaryItems["Spooky Scary Skeleton"] = (int) (12500 * sellPriceModifier);
@@ -116,7 +116,7 @@ map<string, int> initInventory()
     result["4 Epic Witch"] = 0;
     result["4 Epic Ghost"] = 0;
 
-    result["5 Legendary eadless Horseman"] = 0;
+    result["5 Legendary Casper the Friendly Ghost"] = 0;
     result["5 Legendary Flying Dutchman"] = 0;
     result["5 Legendary Headless Horseman"] = 0;
     result["5 Legendary Spooky Scary Skeleton"] = 0;
@@ -304,6 +304,7 @@ void buyMenu() {
             buyMenu();
         }
     }
+
     if(input == 5) {
         int cost { 1000 };
         if(currency >= cost) {
