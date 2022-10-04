@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// Random global variables that idk how else to declare
 string rarity{};
 map<string, int> inventory;
 int legendaryChance{5};
@@ -12,6 +13,15 @@ int epicChance{20};
 int rareChance{100};
 int uncommonChance{350};
 int currency{0};
+bool oneTime{false};
+
+// Global variables for upgrades.   Increments/Caps
+int uncommonChanceIncrease = 0;  // 14         900
+int rareChanceIncrease = 0;      // 7          775
+int epicChanceIncrease = 0;      // 5          650
+int legendaryChanceIncrease = 0; // 3          500
+
+float sellPriceModifier = 1.8;   // 0.1        inf.
 
 map<string, int> itemMap(int roll) {
     map<string, int> commonItems;
@@ -20,30 +30,30 @@ map<string, int> itemMap(int roll) {
     map<string, int> epicItems;
     map<string, int> legendaryItems;
 
-    commonItems["Candycorn"] = 5;
-    commonItems["Cobweb"] = 5;
-    commonItems["Stick"] = 5;
-    commonItems["Rock"] = 5;
+    commonItems["Candycorn"] = (int) (5 * sellPriceModifier);
+    commonItems["Cobweb"] = (int) (5 * sellPriceModifier);
+    commonItems["Stick"] = (int) (5 * sellPriceModifier);
+    commonItems["Rock"] = (int) (5 * sellPriceModifier);
     
-    uncommonItems["Bat"] = 30;
-    uncommonItems["Pumpkin"] = 30;
-    uncommonItems["Spider"] = 30;
-    uncommonItems["Candle"] = 30;
+    uncommonItems["Bat"] = (int) (30 * sellPriceModifier);
+    uncommonItems["Pumpkin"] = (int) (30 * sellPriceModifier);
+    uncommonItems["Spider"] = (int) (30 * sellPriceModifier);
+    uncommonItems["Candle"] = (int) (30 * sellPriceModifier);
     
-    rareItems["Cat"] = 200;
-    rareItems["Jack O'Lantern"] = 200;
-    rareItems["Coffin"] = 200;
-    rareItems["Tombstone"] = 200;
+    rareItems["Cat"] = (int) (200 * sellPriceModifier);
+    rareItems["Jack O'Lantern"] = (int) (200 * sellPriceModifier);
+    rareItems["Coffin"] = (int) (200 * sellPriceModifier);
+    rareItems["Tombstone"] = (int) (200 * sellPriceModifier);
 
-    epicItems["Skeleton"] = 2000;
-    epicItems["Vampire"] = 2000;
-    epicItems["Witch"] = 2000;
-    epicItems["Ghost"] = 2000;
+    epicItems["Skeleton"] = (int) (2000 * sellPriceModifier);
+    epicItems["Vampire"] = (int) (2000 * sellPriceModifier);
+    epicItems["Witch"] = (int) (2000 * sellPriceModifier);
+    epicItems["Ghost"] = (int) (2000 * sellPriceModifier);
 
-    legendaryItems["Headless Horseman"] = 12500;
-    legendaryItems["Flying Dutchman"] = 12500;
-    legendaryItems["Headless Horseman"] = 12500;
-    legendaryItems["Spooky Scary Skeleton"] = 12500;
+    legendaryItems["Headless Horseman"] = (int) (12500 * sellPriceModifier);
+    legendaryItems["Flying Dutchman"] = (int) (12500 * sellPriceModifier);
+    legendaryItems["Headless Horseman"] = (int) (12500 * sellPriceModifier);
+    legendaryItems["Spooky Scary Skeleton"] = (int) (12500 * sellPriceModifier);
     
 
     if (roll <= 5)
@@ -51,15 +61,15 @@ map<string, int> itemMap(int roll) {
         system("color 86");
         rarity = "Legendary";
         return legendaryItems;
-    } else if (roll <= 20)
+    } else if (roll <= 15)
     {
         rarity = "Epic";
         return epicItems;
-    } else if (roll <= 100)
+    } else if (roll <= 75)
     {
         rarity = "Rare";
         return rareItems;
-    } else if (roll <= 350)
+    } else if (roll <= 200)
     {
         rarity = "Uncommon";
         return uncommonItems;
@@ -67,6 +77,11 @@ map<string, int> itemMap(int roll) {
     rarity = "Common";
     return commonItems;
 }
+
+void updateUpgrades() {
+    
+}
+
 
 string itemPull() {
     string item{};
@@ -143,27 +158,27 @@ void sellMenu(int selector, int invIndex) {
         cout << "(" << i << ") " << it->first << ": " << it->second << " Spoopy coins" << "\n";
         i++;
     }
-    cout << "(" << i << ") " << "Back to rarity menu.\n";
+    cout << "(" << i << ") " << "Back to rarity menu\n";
     cout << "What would you like to sell: \n";
     cin >> input;
     if (input > 0 && input < i) {
         auto invIt = inventory.begin();
-        advance(invIt, (invIndex-1)*4 + input - 1);
+        advance(invIt, invIndex*4 + input - 1);
         if (invIt->second==0) {
             system("cls");
-            cout << "You have no " << invIt->first << " to sell!\n";
+            cout << "You have no " << invIt->first.substr(2) << " to sell!\n";
             cin.ignore();
             cin.get();
         }
         else {
-            cout << "You have " << invIt->second << " " << invIt->first << ".\n";
+            cout << "You have " << invIt->second << " " << invIt->first.substr(2) << ".\n";
             inventory.find(invIt->first)->second-=1;
             auto it = rarityMap.begin();
             advance(it, input - 1);
             system("cls");
             currency += it->second;
             cout << "Sold " << it->first << " for " << it->second << " Spoppy coins.\nYou now have " << currency << " Spoopy coins.\n";
-            cout << "You now have " << invIt->second << " " << invIt->first << ".\n";
+            cout << "You now have " << invIt->second << " " << invIt->first.substr(2) << ".\n";
             cin.ignore();
             cin.get();    
         }
@@ -178,17 +193,19 @@ void sellMenu(int selector, int invIndex) {
     system("cls");
 }
 
+int main();
 
 void promptBuyOrSell() {
     system("cls");
     int input{};
-    cout << "(1) Buy items\n(2) Sell items\n(3) Back to menu\nPlease enter an option: ";
+    cout << "(1) Buy upgrades\n(2) Sell items\n(3) Back to menu\nPlease enter an option: ";
     cin >> input;
     if(input == 2) {
         promptRarity();
     }
     if(input == 3) {
         system("cls");
+        main();
     }
 }
 
@@ -217,10 +234,13 @@ void promptRarity() {
     }
 }
 
+
 int main() {
-    srand(time(NULL));
-    
-    inventory = initInventory();
+    if(oneTime == false) {
+        srand(time(NULL));
+        inventory = initInventory();
+        oneTime = true;
+    }
     int input{};
     string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
     string dump{};
