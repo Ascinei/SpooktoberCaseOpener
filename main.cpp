@@ -18,6 +18,8 @@ int currency{ 0 };
 bool oneTime{ false };
 bool couponApplied{ false };
 bool doubleSellApplied{ false };
+int pulled{ 0 };
+int totalEarned{ 0 };
 
 // Global variables for upgrades.   Increments/Caps     Total Purchases
 int uncommonChanceIncrease = 0;  // 14         900      50
@@ -155,7 +157,7 @@ string checkInventory() {
     for(auto it = inventory.begin(); it != inventory.end(); ++it) {
         cout << it->first.substr(2) << ": " << it->second << "\n";
     }
-    cout << "Press enter to continue";
+    cout << "Press enter to continue\n";
     return "";
 }
 
@@ -189,6 +191,7 @@ void sellMenu(int selector, int invIndex) {
             advance(it, input - 1);
             system("cls");
             currency += it->second;
+            totalEarned += it->second;
             cout << "Sold " << it->first << " for " << it->second << " Spoopy coins.\nYou now have " << currency << " Spoopy coins.\n";
             cout << "You now have " << invIt->second << " " << invIt->first.substr(2) << ".\n";
             cin.ignore();
@@ -482,6 +485,15 @@ void openCraftingMenu() {
     }
 }
 
+void openStats() {
+    system("cls");
+    cout << "Current balance: " << currency << "\nTotal Earned: " << totalEarned << "\nTimes pulled: " << pulled << "\n";
+    cout << "Press enter to continue\n";
+    cin.ignore();
+    cin.get();
+    return;
+}
+
 int main() {
     if(oneTime == false) {
         srand(time(NULL));
@@ -492,7 +504,7 @@ int main() {
         craftedItems["Double Drop"] = false;
     }
     int input{};
-    string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
+    string menu{"(1) Open a box\n(2) Check inventory\n(3) Browse shop\n(4) Open crafting\n(5) Open stats\n(0) Close game\nPlease enter an option: "};
     string dump{};
     string item{};
     while (true) {
@@ -514,6 +526,7 @@ int main() {
 
         if(input == 1) {
             system("cls");
+            pulled++;
             item = itemPull();
             addToInventory(item, rarity);
             cout << "\n\nYou got a " << rarity << " " << item  << "!\n\n";
@@ -538,6 +551,9 @@ int main() {
         }
         if(input == 4) {
             openCraftingMenu();
+        }
+        if(input == 5) {
+            openStats();
         }
         if(input == 0) {
             system("cls");
