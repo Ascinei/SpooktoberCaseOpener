@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <list>
 #include <time.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -14,6 +16,8 @@ int rareChance{ 100 };
 int uncommonChance{ 350 };
 int currency{ 1000000 };
 bool oneTime{ false };
+bool couponApplied{ false };
+bool doubleSellApplied{ false };
 
 // Global variables for upgrades.   Increments/Caps     Total Purchases
 int uncommonChanceIncrease = 0;  // 14         900      50
@@ -28,6 +32,10 @@ int cost2{ 1000 };
 int cost3{ 2500 };
 int cost4{ 5000 };
 int cost5{ 1000 };
+
+// Global variables for crafting.
+map<string, bool> craftedItems;
+
 // int doubleDropChance;
 
 map<string, int> itemMap(int roll) {
@@ -197,7 +205,6 @@ void sellMenu(int selector, int invIndex) {
     system("cls");
 }
 
-int main();
 void buyMenu();
 
 void promptBuyOrSell() {
@@ -213,7 +220,7 @@ void promptBuyOrSell() {
     }
     if(input == 3) {
         system("cls");
-        main();
+        return;
     }
 }
 
@@ -372,11 +379,129 @@ void buyMenu() {
     }
 }
 
+void printRecipe(map<string, int> recipe, string name)
+{
+    system("cls");
+    cout << name << "\n";
+    for (auto it = recipe.begin(); it != recipe.end(); ++it) {
+        cout << "Need " << it->second << " " << it->first.substr(2) << "\n";
+    }
+}
+
+void openCraftingMenu();
+void craft(map<string, int> recipe);
+
+void canCraft(map<string, int> recipe, string item) {
+    if(craftedItems[item]) {
+        system("cls");
+        cout << "You already crafted this item.";
+        cin.ignore();
+        cin.get();
+        openCraftingMenu();
+        return;
+    }
+    for(auto it = recipe.begin(); it != recipe.end(); ++it) {
+        if(inventory[it->first] < it->second) {
+            system("cls");
+            cout << "Not enough materials to craft this item.";
+            cin.ignore();
+            cin.get();
+            openCraftingMenu();
+            return;
+        };
+    }
+    craft(recipe);
+    craftedItems[item] = true;
+    system("cls");
+    cout << "Successfully crafted this item.";
+    cin.ignore();
+    cin.get();
+    openCraftingMenu();
+}
+
+void craft(map<string, int> recipe) 
+{
+    for(auto it = recipe.begin(); it != recipe.end(); ++it) 
+    {
+        inventory[it->first] = inventory[it->first] - it->second;
+    }
+}
+
+void promptCraft(map<string, int> recipe, string item) 
+{
+    string input{};
+    cout << "Would you like to craft this item? (Y/N)\n";
+    cin >> input;
+    if (input == "Y") {
+        canCraft(recipe, item);
+    }
+    if (input == "N") {
+        openCraftingMenu(); 
+    }
+};
+
+
+void openCraftingMenu() {
+
+    map<string, int> coupon;
+    coupon["2 Uncommon Candle"] = 10;
+    coupon["4 Epic Witch"] = 3;
+    coupon["5 Legendary Headless Horseman"] = 2;
+    coupon["5 Legendary Spooky Scary Skeleton"] = 2;
+
+    map<string, int> doubleSell;
+    doubleSell["3 Rare Cat"] = 5;
+    doubleSell["3 Rare Jack O'Lantern"] = 10;
+    doubleSell["5 Legendary Casper the Friendly Ghost"] = 5;
+
+    map<string, int> doubleDrop;
+    doubleDrop["1 Common Candycorn"] = 30;
+    doubleDrop["3 Rare Tombstone"] = 9;
+    doubleDrop["4 Epic Skeleton"] = 9;
+    doubleDrop["5 Legendary Flying Dutchman"] = 3;
+
+    system("cls");
+    int input{};
+    cout << "(1) 50% Off Coupon\n(2) 2x Sell Price\n(3) 10% Chance Double Drop\n(4) Back to menu";
+    cin >> input;   
+    if(input == 1) {
+        printRecipe(coupon, "50% Off Coupon made of spooky calcium.");
+        promptCraft(coupon, "Coupon");
+    }
+    if(input == 2) {
+        printRecipe(doubleSell, "2x Sell Price because traders love friendly ghosts.");
+        promptCraft(doubleSell, "Double Sell");
+    }
+    if(input == 3) {
+        printRecipe(doubleDrop, "10% Chance Drop Duplicator courtesy of the Flying Dutchman's crew.");
+        promptCraft(doubleDrop, "Double Drop");
+    }
+    if(input == 4) {
+        system("cls");
+        return;
+    }
+}
+
 int main() {
     if(oneTime == false) {
         srand(time(NULL));
         inventory = initInventory();
         oneTime = true;
+        craftedItems["Coupon"] = false;
+        craftedItems["Double Sell"] = false;
+        craftedItems["Double Drop"] = false;
+    }
+    if(couponApplied == false && craftedItems["Coupon"]) {
+        cost1 = cost1/2;
+        cost2 = cost2/2;
+        cost3 = cost3/2;
+        cost4 = cost4/2;
+        cost5 = cost5/2;
+        couponApplied = true;
+    }
+    if(doubleSellApplied == false && craftedItems["Double Sell"]) {
+        sellPriceModifier = sellPriceModifier * 2;
+        doubleSellApplied = true;
     }
     int input{};
     string menu{"(1) Open a box.\n(2) Check inventory.\n(3) Browse shop.\n(4) Open crafting.\n(0) Close game.\nPlease enter an option: "};
@@ -392,6 +517,10 @@ int main() {
             item = itemPull();
             addToInventory(item, rarity);
             cout << "\n\nYou got a " << rarity << " " << item  << "!\n\n";
+            if(craftedItems["Double Drop"]) {
+                addToInventory(item, rarity);
+                cout << "You got a double of this drop!";
+            }
             cin.ignore();
             cin.get();
             system("color 02");
@@ -406,6 +535,9 @@ int main() {
         }
         if(input == 3) {
             promptBuyOrSell();
+        }
+        if(input == 4) {
+            openCraftingMenu();
         }
         if(input == 0) {
             system("cls");
