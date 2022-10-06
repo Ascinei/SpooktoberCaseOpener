@@ -14,7 +14,7 @@ int legendaryChance{ 5 };
 int epicChance{ 20 };
 int rareChance{ 100 };
 int uncommonChance{ 350 };
-int currency{ 1000000 };
+int currency{ 0 };
 bool oneTime{ false };
 bool couponApplied{ false };
 bool doubleSellApplied{ false };
@@ -196,7 +196,7 @@ void sellMenu(int selector, int invIndex) {
         }
         sellMenu(selector, invIndex);
     }    
-    if (input == i) {
+    else if (input == i) {
         promptRarity();
     } else {
         sellMenu(selector, invIndex);
@@ -215,10 +215,10 @@ void promptBuyOrSell() {
     if(input == 1) {
         buyMenu();
     }
-    if(input == 2) {
+    else if(input == 2) {
         promptRarity();
     }
-    if(input == 3) {
+    else {
         system("cls");
         return;
     }
@@ -232,19 +232,19 @@ void promptRarity() {
     if(input == 1) {
         sellMenu(uncommonChance+1+uncommonChanceIncrease, 0);
     }    
-    if(input == 2) {
+    else if(input == 2) {
         sellMenu(uncommonChance+uncommonChanceIncrease, 1);
     }
-    if(input == 3) {
+    else if(input == 3) {
         sellMenu(rareChance+rareChanceIncrease, 2);
     }
-    if(input == 4) {
+    else if(input == 4) {
         sellMenu(epicChance+epicChanceIncrease, 3);
     }    
-    if(input == 5) {
+    else if(input == 5) {
         sellMenu(legendaryChance+legendaryChanceIncrease, 4);
     }
-    if(input == 6) {
+    else {
         promptBuyOrSell();
     }
 }
@@ -275,7 +275,7 @@ void buyMenu() {
             buyMenu();       
         }
     }
-    if(input == 2) {
+    else if(input == 2) {
         if  (uncommonChanceIncrease>=140) {
             if(currency >= cost2) {
                 system("cls");
@@ -301,7 +301,7 @@ void buyMenu() {
             buyMenu();        
         }
     }
-    if(input == 3) {
+    else if(input == 3) {
 
         if (rareChanceIncrease >= 300) {
             if(currency >= cost3) {
@@ -328,7 +328,7 @@ void buyMenu() {
             buyMenu();
         }
     }
-    if(input == 4) {
+    else if(input == 4) {
 
         if (epicChanceIncrease >= 350) {
             if (currency >= cost4) {
@@ -356,7 +356,7 @@ void buyMenu() {
         }
     }
 
-    if(input == 5) {
+    else if(input == 5) {
         if(currency >= cost5) {
             system("cls");
             sellPriceModifier *= 1.05;
@@ -374,7 +374,7 @@ void buyMenu() {
             buyMenu();
         }
     }
-    if(input == 6) {
+    else {
         promptBuyOrSell();
     }
 }
@@ -432,10 +432,10 @@ void promptCraft(map<string, int> recipe, string item)
     string input{};
     cout << "Would you like to craft this item? (Y/N)\n";
     cin >> input;
-    if (input == "Y") {
+    if (input == "Y" || input == "y") {
         canCraft(recipe, item);
     }
-    if (input == "N") {
+    else {
         openCraftingMenu(); 
     }
 };
@@ -444,21 +444,21 @@ void promptCraft(map<string, int> recipe, string item)
 void openCraftingMenu() {
 
     map<string, int> coupon;
-    coupon["2 Uncommon Candle"] = 0;
-    coupon["4 Epic Witch"] = 0;
-    coupon["5 Legendary Headless Horseman"] = 0;
-    coupon["5 Legendary Spooky Scary Skeleton"] = 0;
+    coupon["2 Uncommon Candle"] = 10;
+    coupon["4 Epic Witch"] = 5;
+    coupon["5 Legendary Headless Horseman"] = 2;
+    coupon["5 Legendary Spooky Scary Skeleton"] = 2;
 
     map<string, int> doubleSell;
-    doubleSell["3 Rare Cat"] = 0;
-    doubleSell["3 Rare Jack O'Lantern"] = 0;
-    doubleSell["5 Legendary Casper the Friendly Ghost"] = 0;
+    doubleSell["3 Rare Cat"] = 5;
+    doubleSell["3 Rare Jack O'Lantern"] = 10;
+    doubleSell["5 Legendary Casper the Friendly Ghost"] = 3;
 
     map<string, int> doubleDrop;
-    doubleDrop["1 Common Candycorn"] = 0;
-    doubleDrop["3 Rare Tombstone"] = 0;
-    doubleDrop["4 Epic Skeleton"] = 0;
-    doubleDrop["5 Legendary Flying Dutchman"] = 0;
+    doubleDrop["1 Common Candycorn"] = 30;
+    doubleDrop["3 Rare Tombstone"] = 9;
+    doubleDrop["4 Epic Skeleton"] = 9;
+    doubleDrop["5 Legendary Flying Dutchman"] = 3;
 
     system("cls");
     int input{};
@@ -468,15 +468,15 @@ void openCraftingMenu() {
         printRecipe(coupon, "50% Off Coupon made of spooky calcium.");
         promptCraft(coupon, "Coupon");
     }
-    if(input == 2) {
+    else if(input == 2) {
         printRecipe(doubleSell, "2x Sell Price because traders love friendly ghosts.");
         promptCraft(doubleSell, "Double Sell");
     }
-    if(input == 3) {
+    else if(input == 3) {
         printRecipe(doubleDrop, "10% Chance Drop Duplicator courtesy of the Flying Dutchman's crew.");
         promptCraft(doubleDrop, "Double Drop");
     }
-    if(input == 4) {
+    else {
         system("cls");
         return;
     }
