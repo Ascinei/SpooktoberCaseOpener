@@ -491,6 +491,7 @@ void openStats() {
     cout << "Press enter to continue\n";
     cin.ignore();
     cin.get();
+    system("cls");
     return;
 }
 
